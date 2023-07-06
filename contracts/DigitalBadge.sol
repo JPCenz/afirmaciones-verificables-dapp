@@ -4,18 +4,17 @@ pragma solidity 0.8.9;
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract DigitalBadge is
     Initializable,
     ERC721Upgradeable,
     ERC721EnumerableUpgradeable,
     ERC721URIStorageUpgradeable,
-    ERC721BurnableUpgradeable,
     AccessControlUpgradeable,
     UUPSUpgradeable
 {
@@ -25,9 +24,15 @@ contract DigitalBadge is
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
     bytes32 public constant VERIFIER_ROLE = keccak256("VERIFIER_ROLE");
-    bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
 
-    mapping(uint256 => bool) isTransferable;
+    IERC20 usdcToken ;
+
+    struct MetadataToken {
+        bool isTransferable;
+        uint256 amountUSDC;
+    }
+    mapping(uint256 => MetadataToken) metadataToken;
+    
 
     function initialize(
         string memory _name,
@@ -36,17 +41,24 @@ contract DigitalBadge is
         __ERC721_init(_name, _symbol);
         __ERC721Enumerable_init();
         __ERC721URIStorage_init();
-        __ERC721Burnable_init();
         __AccessControl_init();
         __UUPSUpgradeable_init();
 
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(MINTER_ROLE, msg.sender);
         _grantRole(UPGRADER_ROLE, msg.sender);
-        _grantRole(BURNER_ROLE, msg.sender);
+        _grantRole(VERIFIER_ROLE, msg.sender);
     }
 
-    function burn(uint256 tokenId) public override onlyRole(BURNER_ROLE){
+
+
+    function burn(uint256 tokenId)  external onlyRole(VERIFIER_ROLE) {
+        uint256 _valueBadge = metadataToken[tokenId].amountUSDC;
+        address owner = ERC721Upgradeable.ownerOf(tokenId);
+        require( usdcToken.allowance(msg.sender, address(this)) >= _valueBadge,"DB: Not enough allow");
+        require( usdcToken.balanceOf(msg.sender) >= _valueBadge,"DB: Not enough balance");
+        
+        usdcToken.transferFrom(msg.sender, owner, _valueBadge);
         _burn(tokenId);
     }
 
@@ -54,28 +66,56 @@ contract DigitalBadge is
     function safeMint(
         address to,
         string memory uri,
-        bool _isTransferable
+        bool _isTransferable,
+        uint256 amountValue
     ) public onlyRole(MINTER_ROLE) {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
-        isTransferable[tokenId] = _isTransferable;
+        setMetadataToken(tokenId,_isTransferable,amountValue);
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
     }
+
+
+
+
+    function valueOfInsignia(uint256 _tokenId)  public view returns (uint256) {
+        require(ownerOf(_tokenId) != address(0),"DB Token no existe");
+        return metadataToken[_tokenId].amountUSDC;
+    }
+
+
+
+    function setTokenAddress(
+        address _tknAdress
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        usdcToken = IERC20(_tknAdress);
+    }
+
+    function getTokenAddress() external view returns(address){
+        return address(usdcToken);
+    }
+
+
+    function setMetadataToken(uint256 _tokenId, bool _isTransferable, uint256 _amountValue) internal {
+        MetadataToken storage metadataTkn = metadataToken[_tokenId];
+        metadataTkn.isTransferable = _isTransferable;
+        metadataTkn.amountUSDC = _amountValue;
+    }
+
+
 
     function _authorizeUpgrade(
         address newImplementation
     ) internal override onlyRole(UPGRADER_ROLE) {}
 
-    // The following functions are overrides required by Solidity.
-
+    // overrides by Solidity.
     function _beforeTokenTransfer(
         address from,
         address to,
         uint256 tokenId,
         uint256 batchSize
     ) internal override(ERC721Upgradeable, ERC721EnumerableUpgradeable) {
-        if (from != address(0) || to != address(0)) {}
 
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
     }
@@ -94,11 +134,6 @@ contract DigitalBadge is
         override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
         returns (string memory)
     {
-        address owner = ERC721Upgradeable.ownerOf(tokenId);
-        require(_msgSender() ==  owner ||
-            hasRole(VERIFIER_ROLE,_msgSender())
-            || hasRole(MINTER_ROLE,_msgSender())
-            ,"DigitalBadge: No tienes permisos para ver el TokenURI");
         return super.tokenURI(tokenId);
     }
 
@@ -107,9 +142,10 @@ contract DigitalBadge is
         address to,
         uint256 tokenId
     ) public virtual override(ERC721Upgradeable, IERC721Upgradeable) {
+        MetadataToken storage metadataTkn = metadataToken[tokenId];
         require(
-            isTransferable[tokenId],
-            "DigitalBadge: Token No se puede transferir"
+            metadataTkn.isTransferable,
+            "Di Ba: Tkn No se puede transferir"
         );
         return super.safeTransferFrom(from, to, tokenId);
     }
