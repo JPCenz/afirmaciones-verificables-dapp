@@ -42,7 +42,7 @@ const useWeb3Provider = () => {
           isAuthenticated: true,
         });
 
-        //localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem("isAuthenticated", "true");
       }
     } catch {}
   }, [state]);
@@ -63,8 +63,10 @@ const useWeb3Provider = () => {
   useEffect(() => {
     if (typeof window.ethereum === "undefined") return;
 
-    window.ethereum.on("accountsChanged", (accounts) => {
-      setState({ ...state, address: accounts[0] });
+    window.ethereum.on("accountsChanged",async  (accounts) => {
+      const provider = state.provider
+      const signer = await provider.getSigner();
+      setState({ ...state, address: accounts[0],signer:signer });
     });
 
     window.ethereum.on("networkChanged", (network) => {

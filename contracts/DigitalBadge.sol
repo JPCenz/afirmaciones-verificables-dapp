@@ -150,6 +150,10 @@ contract DigitalBadge is
         return super.safeTransferFrom(from, to, tokenId);
     }
 
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public virtual override(ERC721Upgradeable, IERC721Upgradeable) {
+        safeTransferFrom(from, to, tokenId, data);
+    }
+
     function supportsInterface(
         bytes4 interfaceId
     )

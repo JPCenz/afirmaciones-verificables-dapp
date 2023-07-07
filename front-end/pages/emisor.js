@@ -2,14 +2,15 @@ import { useMemo, useState } from "react";
 import { useWeb3Context } from "@/context/web3Context";
 import useDigitalBadgeContract from "@/hooks/useBadgeContract";
 import { useEffect } from "react";
+import { parseUnits } from "ethers";
+import Swal from "sweetalert2";
 
 export default function Emisor() {
   const {
     connectWallet,
     disconnect,
-    state: { isAuthenticated, address, currentChain, provider },
+    state: { isAuthenticated, address, currentChain, provider,signer },
   } = useWeb3Context();
-
   const contract = useDigitalBadgeContract();
 
   const [checked, setChecked] = useState(false);
@@ -19,17 +20,6 @@ export default function Emisor() {
   };
 
 
-  const mint = async (_to, _uritoken, _is_transferable, _value) => {
-    try {
-
-      const response = await contract.safeMint(_to, _uritoken, _is_transferable, _value);
-      console.log("TX HASH ".response.transactionHash)
-      alert(`Successully  :  txHASH: ${response.transactionHash}`,)
-      console.log("Response:", response);
-    } catch (error) {
-      console.log(error.reason)
-    }
-  }
   useEffect(() => {
     if (!contract) return;
     let mounted = true;
@@ -42,7 +32,8 @@ export default function Emisor() {
     };
 
     if (mounted) {
-     // getLastMessage();
+      console.log(signer)
+      // getLastMessage();
     }
 
     return () => {
@@ -53,8 +44,6 @@ export default function Emisor() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     //get data from the form
-
-    // Read the form data
     const form = event.target;
     const formData = new FormData(form);
     formData.append("is_transferable", checked);
@@ -85,9 +74,12 @@ export default function Emisor() {
     const result = await response.json();
     try {
       if (response.status == 200 && String(result.uritoken).length > 0) {
-        alert(`HASH CID  ${result?.uritoken}`);
-        const tx = await contract.safeMint(titularAddress, result.uritoken, checked,value)
+        console.log(`HASH CID  ${result?.uritoken}`)
+        const amount = parseUnits(value,6)
+        console.log(amount)
+        const tx = await contract.safeMint(titularAddress, result.uritoken, checked, amount)
         const res = await tx.wait()
+        Swal.isLoading()
         console.log("TX HASH ", res.hash)
         alert(`Successully  :  txHASH: ${res.hash}`,)
         console.log("Response:", res);
@@ -110,19 +102,31 @@ export default function Emisor() {
   return (
     <div>
 
-      <div className="container mx-auto px-8">
+      <div className="container mx-auto  px-32" >
         <h1 className="m-4 ">EMISION DE INSIGNIAS </h1>
-        <button
-          type="button"
-          className="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
-          onClick={connectWallet}
-        >
-          CONNECT como emisor
-        </button>
+        <div className="grid grid-cols-2 gap-4 m-4">
+          <div className="col-start-1 col-end-3 ">
+            <button
+              type="button"
+              className="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+              onClick={connectWallet}
+            >
+              CONNECT como emisor
+            </button>
+          </div>
+          <div className="col-end-7 col-span-2 "> 
+          <div><p >{String(address).substring(0,10)}</p></div>
+            {isAuthenticated && (
+              <span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">Connected</span>
+            )}
+          </div>
+
+        </div>
+
       </div>
 
 
-      <div className="container mx-auto px-8">
+      <div className="container mx-auto px-32">
         <form onSubmit={handleSubmit}>
           <div className="mb-6">
             <label
@@ -135,6 +139,8 @@ export default function Emisor() {
               name="titular"
               type="text"
               id="titular"
+              pattern="^0x[a-fA-F0-9]{40}$"
+              title="Debería ser una dirección Ethereum válida comenzando con 0x y seguido de 40 caracteres hexadecimales."
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="0x00000"
               required
