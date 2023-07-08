@@ -65,7 +65,11 @@ const useWeb3Provider = () => {
 
     window.ethereum.on("accountsChanged",async  (accounts) => {
       const provider = state.provider
-      const signer = await provider.getSigner();
+      let signer
+      if (provider != null && !state.isAuthenticated) {
+        signer = await provider.getSigner();
+      }
+      
       setState({ ...state, address: accounts[0],signer:signer });
     });
 
