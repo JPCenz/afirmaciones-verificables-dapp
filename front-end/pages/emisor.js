@@ -78,8 +78,7 @@ export default function Emisor() {
         const amount = parseUnits(value,6)
         console.log(amount)
         const tx = await contract.safeMint(titularAddress, result.uritoken, checked, amount)
-        const res = await tx.wait()
-        Swal.isLoading()
+        const res = await tx.wait();
         console.log("TX HASH ", res.hash)
         alert(`Successully  :  txHASH: ${res.hash}`,)
         console.log("Response:", res);
