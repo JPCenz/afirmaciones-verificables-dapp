@@ -1,4 +1,10 @@
 // SPDX-License-Identifier: MIT
+/// @title This contract is used for USDCoins MINTER ROLE.
+/// @author  JPCenz
+/// @notice You can use this contract for only the most basic simulation
+/// @dev All function calls are currently implemented without side effects
+/// @custom:experimental This is an experimental contract.
+
 pragma solidity 0.8.9;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";

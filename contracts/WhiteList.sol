@@ -1,4 +1,9 @@
 // SPDX-License-Identifier: MIT
+/// @title A Whitelist used to encrypt personal data.
+/// @author  Eduardo Chumpitaz Tome
+/// @notice You can use this contract for only the most basic simulation
+/// @dev All function calls are currently implemented without side effects
+/// @custom:experimental This is an experimental contract.
 pragma solidity 0.8.9;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
