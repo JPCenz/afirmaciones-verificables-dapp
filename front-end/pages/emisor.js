@@ -180,10 +180,14 @@ export default function Emisor() {
             >
               <option selected>Choose an option</option>
               <option value="Liberacion de CTS">Liberacion de CTS</option>
+              <option value="Ticket Ganador Loteria">Ticket Ganador Loteria</option>
+              <option value="Cheque bancario">Cheque bancario</option>
+              <option value="Pagare">Pagare</option>
+              <option value="Otro titulo valor">Otro titulo valor</option>
             </select>
           </div>
 
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <label
               htmlFor="banco"
               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -199,9 +203,9 @@ export default function Emisor() {
               <option selected>Choose an option</option>
               <option value="BBVA">BBVA</option>
             </select>
-          </div>
+          </div> */}
 
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <label
               htmlFor="empresa"
               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -231,6 +235,23 @@ export default function Emisor() {
               name="ruc"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="2099809...."
+              required
+            />
+          </div> */}
+
+          <div className="mb-6">
+            <label
+              htmlFor="data_to_encrypt"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Datos Sensibles a encriptar
+            </label>
+            <input
+              type="text"
+              id="data_to_encrypt"
+              name="data_to_encrypt"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="...."
               required
             />
           </div>
