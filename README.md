@@ -100,6 +100,8 @@ The team:
 
 ![image](https://github.com/JPCenz/afirmaciones-verificables-dapp/assets/7441208/85e4a2f5-3b7f-4a35-a705-20eb66c889d3)
 
+![image](https://github.com/JPCenz/afirmaciones-verificables-dapp/assets/7441208/bccb2607-5d0d-406d-835c-06b54f7b5bbb)
+
 ![image](https://github.com/JPCenz/afirmaciones-verificables-dapp/assets/7441208/30bb9805-f0a6-4f04-a331-2a33870dfbfd)
 
 
