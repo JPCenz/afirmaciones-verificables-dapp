@@ -1,4 +1,4 @@
-#  FINAL PROJECT BOOTCAMP SOLIDITY BLOCKCHAINBITES AND NTTDATA - Afirmaciones Verificables
+#  FINAL PROJECT BOOTCAMP SOLIDITY BLOCKCHAINBITES AND NTTDATA - Verifiable Claims
 ![image](https://github.com/JPCenz/afirmaciones-verificables-dapp/assets/7441208/9e98fd24-9ad5-4257-baaf-8c867aa6646b)
 
 README
