@@ -1,4 +1,5 @@
 import axios from "axios";
+import { encrypt } from '@metamask/eth-sig-util';
 
 export default async function handler(req, res) {
 
@@ -18,6 +19,7 @@ export default async function handler(req, res) {
       titular,
       type,
       banco,
+      data_to_encrypt
     } = body;
     ;
 
@@ -37,12 +39,38 @@ export default async function handler(req, res) {
     let actualDate = new Date(); 
     let issuance_date = actualDate.toISOString().slice(0, 10); // convierte la fecha a formato ISO y luego toma sólo la parte de la fecha
 
-    let encrypted_data = [
-      {
-        "04a349b7a07a547bb027984d832c1eb42f581a1b0dc1b46a3e6b94f20058d387778b8a8d5441bd0b0a9248d1c56653c8d44be758cd132091fcacd2f59a42899fee":"data encrypted"
-      },
     
-    ]
+    let encrypted_data = [];
+
+    let publicKeyList = ['IRx9CJ4X8wAWiFzkQe6c0ih2Ts4ei3ujD+3LiKLguAE=','o/+Q/PSv4GYLHmO32yADEWwx/z+kMCrX1ID/xsO7YzA='];
+    if (data_to_encrypt) {
+      const VERSION = 'x25519-xsalsa20-poly1305'
+      publicKeyList.forEach(pk => {
+        const enc =  encrypt({
+          publicKey: pk,
+          data: data_to_encrypt,
+          version: VERSION,
+        });
+
+        console.log(pk)
+        const obj = {
+        }
+        
+
+        const ct = `0x${Buffer.from(JSON.stringify(enc), 'utf8').toString('hex')}`;
+        obj[pk] = ct
+        encrypted_data.push(
+          obj
+          )
+      });
+      
+    }
+
+
+
+
+
+    delete body.data_to_encrypt
 
     const newBody = {
       ...body,

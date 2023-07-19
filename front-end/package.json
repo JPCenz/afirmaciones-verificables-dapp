@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@metamask/eth-sig-util": "6.0.0",
     "@rainbow-me/rainbowkit": "^1.0.4",
     "autoprefixer": "10.4.14",
     "axios": "1.4.0",
