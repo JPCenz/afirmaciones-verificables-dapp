@@ -73,10 +73,11 @@ export default function TestVerificador() {
       }
 
     } catch (error) {
+      console.log(error)
       Swal.fire({
         icon: 'error',
         title: 'Oops...',
-        text: `${error.reason}`
+        text: `${error.message}`
       })
 
     }
@@ -94,7 +95,8 @@ export default function TestVerificador() {
         const id = i.id;
         data.push({
           id,
-          obj
+          obj,
+          uri:i.uri
         });
       }
 
@@ -227,7 +229,7 @@ export default function TestVerificador() {
     return () => {
       mounted = false;
     };
-  }, [contract, usdcContract, searchAccount]);
+  }, [contract, usdcContract, searchAccount,]);
 
 
 
@@ -305,14 +307,14 @@ export default function TestVerificador() {
 
             <div key={i.id} className="">
               <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 ">
-                <a href="#" className="flex justify-center items-center">
+                <a href={i.uri} className="flex justify-center items-center" target="_blank">
                   <img class="rounded-full w-80 h-80 m-2 " src={i.obj.image_uri ?? "https://gateway.pinata.cloud/ipfs/QmaZzxDPYSQMQArLzXB1iN76TY9AieedTujXQHG5hDkoJN"} alt="Imagen" />
                 </a>
                 <div class="p-5">
                   <a href="#">
                     <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{i.obj.type}</h5>
                   </a>
-                  <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">USDC {i.obj.value_amount}</p>
+                  <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Valor:  USDC {i.obj.value_amount}</p>
                   <p class="mb-3 font-normal text-gray-700 dark:text-gray-400"> ID: {i.id}</p>
                   {i.data_desencrypted && (
                     <p class="mb-3 font-normal text-gray-700 dark:text-gray-400"> Data desencriptada: {i.data_desencrypted}</p>
