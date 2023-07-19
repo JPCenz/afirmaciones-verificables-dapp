@@ -91,6 +91,46 @@ export default function TestVerificador() {
 
   }
 
+  const safeTransferFrom = async (e) => {
+    console.log(e)
+    try {
+      const {value: valueAddressTo} = await Swal.fire({
+        title: 'Transfer To ...',
+        input: 'text',
+        inputLabel: 'Address',
+        showCancelButton: true,
+        inputValidator: (value) => {
+          if (!value){
+            return 'You need to write an Address!'
+          }
+        }
+      })
+      if(valueAddressTo){
+        try {
+          const tx = await contract.safeTransferFrom(contract.getAddress(),valueAddressTo,e);
+          await tx.wait();
+          console.log(tx);
+          Swal.fire('Confirmed!', `<a> Was transferred to ${valueAddressTo}</a>`, 'success',)
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: `${error.reason}`
+          })
+          console.log(error.reason)
+        }
+      }
+    } catch (error) {
+      console.log(error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: `${error.reason}`
+      })
+    }
+
+  }
+  
   const setAllowance = async () => {
     try {
       const amount = BigInt(10000 * 10 ** 6);
@@ -261,7 +301,14 @@ export default function TestVerificador() {
                     <svg class="w-3.5 h-3.5 ml-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
                       <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9" />
                     </svg>
-                  </a> */}
+                  </a> */
+                    <a onClick={() => safeTransferFrom(i.id)} class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                  Transfer
+                  <svg class="w-3.5 h-3.5 ml-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9" />
+                  </svg>
+                </a>
+                  }
                 </div>
               </div>
             </div>

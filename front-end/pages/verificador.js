@@ -1,7 +1,7 @@
 import { useWeb3Context } from "@/context/web3Context";
 import axios from "axios";
 import useDigitalBadgeContract from "@/hooks/useBadgeContract";
-import { ethers } from "ethers";
+import { decodeBase64, encodeBase64, ethers } from "ethers";
 import { list } from "postcss";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Swal from "sweetalert2";
@@ -25,6 +25,66 @@ export default function TestVerificador() {
   const contract = useDigitalBadgeContract();
   const usdcContract = useUSDCContract();
 
+  const dencrypt = async (data) => {
+    try {
+
+      const keyB64 = await window.ethereum.request({
+        method: 'eth_getEncryptionPublicKey',
+        params: [address],
+      });
+      console.log(keyB64)
+
+      console.log(data)
+      let encMsg = ''
+      if (data.obj?.encrypted_data) {
+        const encryptedList = data.obj?.encrypted_data
+        encryptedList.forEach(e => {
+          if (keyB64 in e) {
+            console.log(e[keyB64]);
+            encMsg = e[keyB64];
+          }
+
+
+        });
+      }
+
+      if (encMsg.length > 0) {
+        const decryptedMessage = await ethereum.request({
+          method: 'eth_decrypt',
+          params: [encMsg, address],
+        });
+        console.log("decrypted: ", decryptedMessage);
+        let newInsignias = insignias.map(e => {
+          if (e.id == data.id) {
+            return { ...e, data_desencrypted: decryptedMessage };
+          } else {
+            return { ...e }
+          }
+        })
+        console.log(newInsignias)
+        setInsignias(newInsignias)
+
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `No puedes ver la informacion porque no tienes permisos`
+        })
+      }
+
+    } catch (error) {
+      console.log(error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: `${error.message}`
+      })
+
+    }
+
+
+  }
+
   const fetchdata = async (_listUris) => {
     const data = []
     try {
@@ -35,7 +95,8 @@ export default function TestVerificador() {
         const id = i.id;
         data.push({
           id,
-          obj
+          obj,
+          uri:i.uri
         });
       }
 
@@ -101,7 +162,7 @@ export default function TestVerificador() {
     }
   }
 
-  const onSubmit = (e) =>{
+  const onSubmit = (e) => {
     e.preventDefault();
     setSearchAccount(e.target.account.value)
 
@@ -168,7 +229,7 @@ export default function TestVerificador() {
     return () => {
       mounted = false;
     };
-  }, [contract, usdcContract, searchAccount]);
+  }, [contract, usdcContract, searchAccount,]);
 
 
 
@@ -243,25 +304,41 @@ export default function TestVerificador() {
         <div class=" mx-12 px-8 mt-7 grid grid-cols-3 gap-2">
 
           {insignias.length > 0 && insignias.map(i => (
-            
+
             <div key={i.id} className="">
               <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 ">
-                <a href="#" className="flex justify-center items-center">
+                <a href={i.uri} className="flex justify-center items-center" target="_blank">
                   <img class="rounded-full w-80 h-80 m-2 " src={i.obj.image_uri ?? "https://gateway.pinata.cloud/ipfs/QmaZzxDPYSQMQArLzXB1iN76TY9AieedTujXQHG5hDkoJN"} alt="Imagen" />
                 </a>
                 <div class="p-5">
                   <a href="#">
                     <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{i.obj.type}</h5>
                   </a>
-                  <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">USDC {i.obj.value_amount}</p>
+                  <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Valor:  USDC {i.obj.value_amount}</p>
                   <p class="mb-3 font-normal text-gray-700 dark:text-gray-400"> ID: {i.id}</p>
-                  <p class="mb-3 font-normal text-gray-700 dark:text-gray-400"> Banco: {i.obj.banco}</p>
-                  <a onClick={() => burn(i.id)} class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                    Burn
-                    <svg class="w-3.5 h-3.5 ml-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
-                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9" />
-                    </svg>
-                  </a>
+                  {i.data_desencrypted && (
+                    <p class="mb-3 font-normal text-gray-700 dark:text-gray-400"> Data desencriptada: {i.data_desencrypted}</p>
+                  )}
+
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <a onClick={() => burn(i.id)} class="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                      Burn
+                      <svg class="w-3.5 h-3.5 ml-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9" />
+                      </svg>
+                    </a>
+                    {i.obj?.encrypted_data?.length > 0 && (
+                      <a onClick={() => dencrypt(i)} class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        Dencrypt
+                        <svg class="w-3.5 h-3.5 ml-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9" />
+                        </svg>
+                      </a>
+                    )}
+                  </div>
+
+
                 </div>
               </div>
             </div>
