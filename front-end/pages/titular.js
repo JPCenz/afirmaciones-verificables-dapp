@@ -107,7 +107,7 @@ export default function TestVerificador() {
       })
       if(valueAddressTo){
         try {
-          const tx = await contract.safeTransferFrom(contract.getAddress(),valueAddressTo,e);
+          const tx = await contract.safeTransferFrom(address,valueAddressTo,e);
           await tx.wait();
           console.log(tx);
           Swal.fire('Confirmed!', `<a> Was transferred to ${valueAddressTo}</a>`, 'success',)
@@ -153,7 +153,7 @@ export default function TestVerificador() {
   useEffect(() => {
     if (!contract && !usdcContract) return;
     let mounted = true;
-
+    setSearchAccount(address)
     const getInsignias = async (account) => {
       try {
         const response = await contract.balanceOf(account);

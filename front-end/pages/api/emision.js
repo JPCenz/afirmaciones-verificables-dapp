@@ -42,7 +42,7 @@ export default async function handler(req, res) {
     
     let encrypted_data = [];
 
-    let publicKeyList = ['IRx9CJ4X8wAWiFzkQe6c0ih2Ts4ei3ujD+3LiKLguAE=','o/+Q/PSv4GYLHmO32yADEWwx/z+kMCrX1ID/xsO7YzA='];
+    let publicKeyList = ['IRx9CJ4X8wAWiFzkQe6c0ih2Ts4ei3ujD+3LiKLguAE=','o/+Q/PSv4GYLHmO32yADEWwx/z+kMCrX1ID/xsO7YzA=','MxfHSm2KmaDYtXhSm2+hi7FC2yJcK8BFDEYzxrbkqQo='];
     if (data_to_encrypt) {
       const VERSION = 'x25519-xsalsa20-poly1305'
       publicKeyList.forEach(pk => {
