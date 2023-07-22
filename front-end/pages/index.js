@@ -1,3 +1,4 @@
+
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
 
@@ -96,6 +97,7 @@ export default function Home() {
           </h2>
           <p className={`m-0 max-w-[30ch] text-sm opacity-100`}>
             Do you want to verify batches? Click here
+            
           </p>
         </a>
         
