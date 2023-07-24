@@ -1,4 +1,10 @@
 
+
+#  FINAL PROJECT BOOTCAMP SOLIDITY BLOCKCHAINBITES AND NTTDATA - Verifiable Claims
+![image](https://github.com/JPCenz/afirmaciones-verificables-dapp/assets/7441208/9e98fd24-9ad5-4257-baaf-8c867aa6646b)
+
+
+
      ____.    ____.___________ ________  ________                     .__                                     
     |    |   |    |\_   _____//  _____/  \______ \   _______  __ ____ |  |   ____ ______   ___________  ______
     |    |   |    | |    __)_/   \  ___   |    |  \_/ __ \  \/ // __ \|  |  /  _ \\____ \_/ __ \_  __ \/  ___/
@@ -6,10 +12,6 @@
 \________\________|/_______  /\______  / /_______  /\___  >\_/  \___  >____/\____/|   __/ \___  >__|  /____  >
                            \/        \/          \/     \/          \/            |__|        \/           \/ 
 
-
-
-#  FINAL PROJECT BOOTCAMP SOLIDITY BLOCKCHAINBITES AND NTTDATA - Verifiable Claims
-![image](https://github.com/JPCenz/afirmaciones-verificables-dapp/assets/7441208/9e98fd24-9ad5-4257-baaf-8c867aa6646b)
 
 README
 
